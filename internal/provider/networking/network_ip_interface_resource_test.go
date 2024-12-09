@@ -11,6 +11,9 @@ import (
 	"github.com/hashicorp/terraform-plugin-sdk/v2/helper/resource"
 )
 
+// example ID: aeef4e4f-a663-11ef-9ca8-00a0b8bc0407
+const idRegex string = "[[:xdigit:]]{8}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{4}-[[:xdigit:]]{12}"
+
 func TestAccNetworkIpInterfaceResource(t *testing.T) {
 	resource.Test(t, resource.TestCase{
 		PreCheck:                 func() { ntest.TestAccPreCheck(t) },
@@ -18,13 +21,24 @@ func TestAccNetworkIpInterfaceResource(t *testing.T) {
 		Steps: []resource.TestStep{
 			// non-existant SVM return code 2621462. Must happen before create/read
 			{
-				Config:      testAccNetworkIPInterfaceResourceConfig("non-existant", "10.10.10.10", "ontap_cluster_1-01", "default-data-files"),
-				ExpectError: regexp.MustCompile("2621462"),
+				Config:      testAccNetworkIPInterfaceResourceConfigHomePortNode("non-existant", "10.10.10.10", "e0d", "ontap_cluster_1-01"),
+				ExpectError: regexp.MustCompile("Code:\"2621462\""),
 			},
 			// non-existant home node
 			{
-				Config:      testAccNetworkIPInterfaceResourceConfig("terraform", "10.10.10.10", "non-existant_home_node", "default-data-files"),
-				ExpectError: regexp.MustCompile("53281680"),
+				Config:      testAccNetworkIPInterfaceResourceConfigHomePortNode("svm0", "10.10.10.10", "e0d", "non-existant_home_node"),
+				ExpectError: regexp.MustCompile("Code:\"53281680\""),
+			},
+			// non-existant broadcast domain
+			{
+				Config:      testAccNetworkIPInterfaceResourceConfigBroadcastDomain("svm0", "10.10.10.10", "non-existant_broadcast_domain"),
+				ExpectError: regexp.MustCompile("Code:\"2\""),
+			},
+			// empty location, no Home Node / Home Port / Broadcast Domain
+			// Error 1967111: "Home node must be specified by at least one location.home_node, location.home_port, or location.broadcast_domain field."
+			{
+				Config:      testAccNetworkIPInterfaceResourceConfigHomePortNode("svm0", "10.10.10.10", "", ""),
+				ExpectError: regexp.MustCompile("Code:\"1967111\""),
 			},
 			// Create and Read
 			// {
