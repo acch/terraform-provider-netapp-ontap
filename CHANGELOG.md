@@ -12,6 +12,7 @@ ENHANCEMENTS:
 
 BUG FIXES:
 
+- **netapp-ontap_security_account**: Error importing security_account resource if same account exists on multiple SVMs([#457](https://github.com/NetApp/terraform-provider-netapp-ontap/issues/457))
 - **netapp-ontap_port**: error when importing VLANs in multi-node clusters ([#479](https://github.com/NetApp/terraform-provider-netapp-ontap/issues/479))
 
 # 2.1.2 (not released)
