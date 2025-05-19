@@ -1,3 +1,9 @@
+# 2.2.x (2025-xx-yy)
+
+BUG FIXES:
+
+- **netapp-ontap_security_account**: unable to unlock existing `security_account` resource ([#499](https://github.com/NetApp/terraform-provider-netapp-ontap/issues/499))
+
 # 2.2.0 (2025-05-01)
 
 FEATURES:
